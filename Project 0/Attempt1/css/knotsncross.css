@@ -1,0 +1,30 @@
+.play {
+    width: 100px;
+    height: 50px;
+    margin-bottom: 20px;
+    background-color: red;
+    align-content: center;
+}
+
+.play p {
+    text-align: center;
+}
+
+.row {
+    margin-bottom: 2.5px;
+}
+
+.block{
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+    margin-left: 2.5px;
+    margin-right: 2.5px;
+    border-radius: 1em;
+    background-color: aquamarine;
+    transition: 0.5s;
+}
+
+.block:hover {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
+}
