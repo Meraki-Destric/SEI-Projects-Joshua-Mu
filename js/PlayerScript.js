@@ -19,43 +19,55 @@ function addPlayerChoice(blockID) {
     // If current player is player 1, run this
     if (currentPlayer === chosenSide) {
         if (chosenByComp || chosenByPlayer) {
-            if (turnAI) {
-                console.log("AI chose an already selected block");
-                return;
-            }
             alert("This option has been chosen before");
+            console.log("Wooo!");
+            return;
         }
-        else {
+        else if (!chosenByComp && !chosenByPlayer) {
+            console.log("Ignoring you either way");
             playerBlocks.push(parseInt(blockID));
             let chosenBlock = $(`#${blockID}`);
             if (colorCode) {
                 chosenBlock.css("background-color", "red");
+                currentPlayer = currentPlayer === O_TEXT ? X_TEXT : O_TEXT;
             }
-            else if (XO)
-            {
+            else if (XO) {
                 chosenBlock.html(currentPlayer);
+                currentPlayer = currentPlayer === O_TEXT ? X_TEXT : O_TEXT;
             }
         }
+
+        timerActive = true;
+        timer();
     }
 
     // If current player is player 2, run this
     else if (currentPlayer === player2Side) {
-        if (chosenByComp || chosenByPlayer) {
-            if (turnAI) {
-                console.log("AI chose an already selected block");
-                return;
+        if (playerBlocks.length + compBlocks.length < rows * cols) {
+            if (chosenByComp || chosenByPlayer) {
+                if (turnAI) {
+                    console.log("AI chose an already selected block");
+                    chooseAIBlock();
+                    console.log("Wooo!");
+                    return;
+                }
+                if (!turnAI) {
+                    alert("This option has been chosen before");
+                    return;
+                }
             }
-            alert("This option has been chosen before");
-        }
-        else {
-            compBlocks.push(parseInt(blockID));
-            let chosenBlock = $(`#${blockID}`);
-            if (colorCode) {
-                chosenBlock.css("background-color", "blue");
-            }
-            else if (XO)
-            {
-                chosenBlock.html(currentPlayer);
+            else if (!chosenByComp && !chosenByPlayer) {
+                console.log("Ignoring you either way");
+                compBlocks.push(parseInt(blockID));
+                let chosenBlock = $(`#${blockID}`);
+                if (colorCode) {
+                    chosenBlock.css("background-color", "blue");
+                    currentPlayer = currentPlayer === O_TEXT ? X_TEXT : O_TEXT;
+                }
+                else if (XO) {
+                    chosenBlock.html(currentPlayer);
+                    currentPlayer = currentPlayer === O_TEXT ? X_TEXT : O_TEXT;
+                }
             }
         }
     }
@@ -70,5 +82,24 @@ function addPlayerChoice(blockID) {
     });
 
     compBlocks = sortComp;
-    currentPlayer = currentPlayer === O_TEXT ? X_TEXT : O_TEXT;
+}
+
+function playerPick(e) {
+    let id = e.target.id;
+    // Signals that the game has started and that no modifications can be made
+    console.log(`ID is ${id}`);
+    if (!timerActive) {
+        if (!gameOver && !turnAI) {
+            gameStarted = true;
+            addPlayerChoice(id);
+            checkWinCondition();
+            if (versingAI) {
+                turnAI = true;
+                console.log("AI Enabled");
+            }
+        }
+        if (turnAI) {
+            chooseAIBlock();
+        }
+    }
 }
