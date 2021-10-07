@@ -10,21 +10,36 @@
 <body>
     <div class="container">
         <header>
-            <nav>
+            <h1>TIC TAC TOE</h1>
 
-            </nav>  
+            <button class="restart"> RESTART </button>
+            <button class="gridSize"> CHANGE GRID SIZE </button>
 
-            <div class="play">
-                <p>PLAY</p>
-            </div>
+
+            <button class="play"> PLAY </button>
+
+
+            <button class="vsAI"> VS. AI</button>
+            <button class="vsPlayer">VS. PLAYER</button>
+
         </header>
 
+        <aside>
+            <div class="eggs">
+                <p class="tiktak"> O </p>
+                <div class="smallBox"></div>
+            </div>
+
+        </aside>
+
         <section class="game">
-            
+
         </section>
+        <p class="winner"></p>
     </div>
 
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="js/PlayerScript.js"></script>
     <script src="js/tictactoe.js"></script>
 </body>
 

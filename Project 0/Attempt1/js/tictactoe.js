@@ -3,6 +3,7 @@
 const O_TEXT = "O";
 const X_TEXT = "X";
 let chosenSide = O_TEXT;
+let player1SIde = O_TEXT;
 let player2Side = X_TEXT;
 let currentPlayer = chosenSide;
 let gameGrid = $(".game");
@@ -14,6 +15,20 @@ let gridList = [];
 let playerBlocks = [];
 
 let compBlocks = [];
+
+let gameStarted = false;
+let gameOver = false;
+
+let numOfTimeSizeIncreased = 0;
+
+//Easter Eggs
+let XO = false;
+let colorCode = true;
+
+// AI
+
+let turnAI = false;
+let versingAI = false;
 
 //#region Borrowed Functions
 
@@ -52,6 +67,7 @@ Array.prototype.equals = function (array) {
 function createGrid(numOfRows, numOfCols) {
     let grid = [];
     let previousID = 0;
+
     for (let i = 0; i < numOfRows; i++) {
         let row = [];
         let rowElement = $("<div></div>")
@@ -70,86 +86,46 @@ function createGrid(numOfRows, numOfCols) {
     }
 
     gridList = grid;
-    console.log(gameGrid);
     checkGrid();
+}
+
+function clearGrid() {
+    gridList = [];
+    playerBlocks = [];
+    compBlocks = [];
+    currentPlayer = chosenSide;
+    $(".row").remove();
 }
 
 function checkGrid() {
     const blocks = Array.from($(".block"));
-    console.log(blocks);
 
     // Basically a cleaner looking for loop
     // Iterates through every variable within this array
     blocks.forEach((block, index) => {
         // Checks for if the player is clicking on a block
-        $(block).on("click", playerPick);
+        if (!gameOver) {
+            $(block).on("click", playerPick);
+        }
     })
 }
 
 function playerPick(e) {
-    const id = e.target.id;
-    console.log(id);
-
-    addPlayerChoice(id);
-    checkWinCondition();
-}
-
-function addPlayerChoice(blockID) {
-    let chosenByPlayer = false;
-    let chosenByComp = false;
-
-    for (let i = 0; i < playerBlocks.length; i++) {
-        console.log(parseInt(blockID));
-        // Check if player has chosen this block before
-        if (parseInt(blockID) === playerBlocks[i]) {
-            chosenByPlayer = true;
-        }
-
-        for (let j = 0; j < compBlocks.length; j++) {
-            // Check if player 2 or the computer has chosen this before
-            if (parseInt(blockID) === compBlocks[j]) {
-                chosenByComp = true;
-            }
+    let id = e.target.id;
+    gameStarted = true;
+    console.log(`ID is ${id}`);
+    if (!gameOver && !turnAI) {
+        gameStarted = true;
+        addPlayerChoice(id);
+        checkWinCondition();
+        if (versingAI) {
+            turnAI = true;
         }
     }
 
-    // If current player is player 1, run this
-    if (currentPlayer === chosenSide) {
-        if (chosenByComp || chosenByPlayer) {
-            console.log("This option has been chosen before");
-        }
-        else {
-            playerBlocks.push(parseInt(blockID));
-            let chosenBlock = $(`#${blockID}`);
-            chosenBlock.css("background-color", "red");
-        }
+    if (turnAI) {
+        chooseAIBlock();
     }
-
-    // If current player is player 2, run this
-    else if (currentPlayer === player2Side) {
-        if (chosenByComp || chosenByPlayer) {
-            console.log("This option has been chosen before");
-        }
-        else {
-            compBlocks.push(parseInt(blockID));
-            let chosenBlock = $(`#${blockID}`);
-            chosenBlock.css("background-color", "blue");
-        }
-    }
-
-    let sortedPlayer = playerBlocks.sort(function (a, b) {
-        return a - b;
-    });
-
-    playerBlocks = sortedPlayer;
-    console.log(`Player has chosen ${playerBlocks}`);
-    let sortComp = compBlocks.sort(function(a, b) {
-        return a - b;
-      });
-      
-    compBlocks = sortComp;
-    console.log(`Computer has chosen ${compBlocks}`);
-    currentPlayer = currentPlayer === O_TEXT ? X_TEXT : O_TEXT;
 }
 
 function findWinConditions() {
@@ -161,11 +137,9 @@ function findWinConditions() {
         for (let j = 0; j < cols; j++) {
             if (i < 1) {
                 // Return the first character of every array
-                console.log(gridList[j][0]);
                 winList.push(gridList[j][0]);
             }
             else {
-                console.log(gridList[j][0 + i]);
                 winList.push(gridList[j][0 + i]);
             }
         }
@@ -174,7 +148,6 @@ function findWinConditions() {
     for (let i = 0; i < diagonals.length; i++) {
         conditions.push(diagonals[i]);
     }
-    console.log(conditions);
     return conditions;
 }
 
@@ -194,14 +167,11 @@ function findDiagonalConditions() {
 
     diagonalWinConditions.push(diagonal1);
     diagonalWinConditions.push(diagonal2);
-    console.log(diagonalWinConditions);
     return diagonalWinConditions;
 }
 
 function checkWinCondition() {
-    console.log(`Current blocks selected: ${playerBlocks.length + compBlocks.length}`);
     let winCondition = findWinConditions();
-    console.log(`Win Conditions are: ${winCondition}`);
 
     // Selects Row
     for (let i = 0; i < gridList.length; i++) {
@@ -220,28 +190,29 @@ function checkWinCondition() {
             }
         }
 
-
-
-
         for (let m = 0; m < winCondition.length + gridList.length; m++) {
-            console.log(`Checking player choices: ${playerRow}`);
-            console.log(`Checking computer choices: ${compRow}`);
-            console.log(`Current checking list is: ${winCondition[m]}`);
-            console.log(`Current checking list is: ${gridList[m]}`);
 
             //Checks if any of the rows have been claimed
             if (playerRow.equals(winCondition[m]) || playerRow.equals(gridList[m])) {
-                console.log("Player Wins");
+                console.log("Player 1 Wins");
+                $(".winner").html("Player Wins");
+                gameStarted = false;
+                gameOver = true;
                 return;
             }
 
             else if (compRow.equals(winCondition[m]) || compRow.equals(gridList[m])) {
-                console.log("Computer Wins");
+                console.log("Player 2 Wins");
+                $(".winner").html("Player 2 Wins");
+                gameStarted = false;
+                gameOver = true;
                 return;
             }
 
             else if (playerBlocks.length + compBlocks.length === rows * cols) {
+                gameStarted = false;
                 console.log("Cat's game. Tie");
+                $(".winner").html("Cat's game. Tie");
             }
             else {
                 console.log("Continue Playing");
@@ -250,6 +221,111 @@ function checkWinCondition() {
     }
 }
 
+function detemineButtons() {
+
+    if (!versingAI) {
+        $(".vsAI").css("visibility", "visible");
+        $(".vsPlayer").css("visibility", "hidden");
+    }
+    if (versingAI) {
+        $(".vsAI").css("visibility", "hidden");
+        $(".vsPlayer").css("visibility", "visible");
+    }
+}
+
+function chooseAIBlock() {
+    let blockChosenByAI = Math.floor(Math.random() * 8);
+    console.log(`Block Chose By AI is: ${blockChosenByAI}`);
+    //Check if player has chosen this option already
+    for (let i = 0; i < playerBlocks.length; i++) {
+        if (blockChosenByAI === playerBlocks[i]) {
+            blockChosenByAI = Math.floor(Math.random() * 8);
+            console.log(`Block Chose By AI is: ${blockChosenByAI}`);
+            i = 0;
+        }
+
+    }
+
+    addPlayerChoice(blockChosenByAI);
+    turnAI = false;
+}
+
 //#endregion
 
-$(".play").on("click", createGrid(rows, cols));
+$(document).ready(() => {
+
+    detemineButtons();
+
+    $(".play").on("click", () => {
+        clearGrid();
+        createGrid(rows, cols);
+        $(".restart").css("visibility", "visible");
+        $(".play").remove();
+        $("h1").remove();
+    });
+
+    $(".tiktak").on("click", () => {
+        if (!gameStarted) {
+            XO = true;
+            colorCode = false;
+        }
+    });
+
+    $(".smallBox").on("click", () => {
+        if (!gameStarted) {
+            XO = false;
+            colorCode = true;
+        }
+    })
+
+    $(".restart").on("click", () => {
+        gameOver = false;
+        $(".winner").html("");
+        clearGrid();
+        createGrid(rows, cols);
+    });
+
+    $(".vsAI").on("click", () => {
+        if (!gameStarted) {
+            versingAI = true;
+            detemineButtons();
+        }
+    });
+
+    $(".vsPlayer").on("click", () => {
+        if (!gameStarted) {
+            versingAI = false;
+            detemineButtons();
+        }
+    });
+
+    $(".gridSize").on("click", () => {
+        numOfTimeSizeIncreased++
+        gameOver = false;
+
+        if (numOfTimeSizeIncreased === 1) {
+            rows = 4;
+            cols = 4;
+            $(".winner").html("");
+            clearGrid();
+            createGrid(rows, cols);
+        }
+
+        if (numOfTimeSizeIncreased === 2) {
+            rows = 5;
+            cols = 5;
+            $(".winner").html("");
+            clearGrid();
+            createGrid(rows, cols);
+        }
+
+        if (numOfTimeSizeIncreased > 2) {
+            rows = 3;
+            cols = 3;
+            numOfTimeSizeIncreased = 0;
+            $(".winner").html("");
+            clearGrid();
+            createGrid(rows, cols);
+        }
+    });
+});
