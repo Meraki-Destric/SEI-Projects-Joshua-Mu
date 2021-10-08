@@ -24,7 +24,6 @@ function addPlayerChoice(blockID) {
             return;
         }
         else if (!chosenByComp && !chosenByPlayer) {
-            console.log("Ignoring you either way");
             playerBlocks.push(parseInt(blockID));
             let chosenBlock = $(`#${blockID}`);
             if (colorCode) {
@@ -57,7 +56,6 @@ function addPlayerChoice(blockID) {
                 }
             }
             else if (!chosenByComp && !chosenByPlayer) {
-                console.log("Ignoring you either way");
                 compBlocks.push(parseInt(blockID));
                 let chosenBlock = $(`#${blockID}`);
                 if (colorCode) {
@@ -72,14 +70,18 @@ function addPlayerChoice(blockID) {
         }
     }
 
+    // Sort Block Lists
     let sortedPlayer = playerBlocks.sort(function (a, b) {
         return a - b;
     });
 
+    // Update Lists
     playerBlocks = sortedPlayer;
+
     let sortComp = compBlocks.sort(function (a, b) {
         return a - b;
     });
+
 
     compBlocks = sortComp;
 }

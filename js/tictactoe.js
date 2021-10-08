@@ -100,10 +100,12 @@ function detemineButtons() {
 function chooseAIBlock() {
     let blockChosenByAI = Math.floor(Math.random() * 8);
     console.log(`Block Chose By AI is: ${blockChosenByAI}`);
-    //Check if player has chosen this option already
     console.log(playerBlocks.length + compBlocks.length);
+    // Loops to see if the chosen block has been chosen before
     if (playerBlocks.length + compBlocks.length < (rows * cols - 1)) {
+        // From Player 1 side
         for (let i = 0; i < playerBlocks.length; i++) {
+            // From Player 2 side
             for (let j = 0; j < compBlocks.length; j++) {
                 if (blockChosenByAI === compBlocks[j]) {
                     blockChosenByAI = Math.floor(Math.random() * 8);
