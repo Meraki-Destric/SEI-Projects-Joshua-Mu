@@ -1,7 +1,7 @@
 Tic Tac Toe
 
 To access site, put the following link into the search bar:
-https://meraki-destric.github.io/SEI-Projects-Joshua-Mu/project0.html
+https://meraki-destric.github.io/Tic-Tac-Toe-Project-0/project0.html
 
 <b>Struggles</b>
 <ul>
